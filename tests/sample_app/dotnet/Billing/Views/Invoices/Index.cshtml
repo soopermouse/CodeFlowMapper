@@ -1,0 +1,10 @@
+@model List<Invoice>
+<h2>Invoices</h2>
+<form asp-action="Pay" method="post">
+  <input asp-for="InvoiceId" type="number" required />
+  <select asp-for="Method">
+    <option value="card">Card</option>
+    <option value="sepa">SEPA transfer</option>
+  </select>
+  <button type="submit">Pay</button>
+</form>

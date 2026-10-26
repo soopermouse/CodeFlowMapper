@@ -1,0 +1,9 @@
+<?php
+require_once('common.inc');
+require_once('www/s/banking/transfer/transfer.inc');
+$user->authorize('BankBO');
+$id = intval($_GET['id']);
+$db = new OldDatabase(Registry::getInstance('mainBO'));
+$row = $db->getData("SELECT * FROM Virements WHERE id = " . $id);
+$tpl = new Template('banking/transferview.tpl');
+$tpl->display('banking/transferview.tpl');

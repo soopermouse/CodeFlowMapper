@@ -1,0 +1,6 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Code Flow Mapper{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
+<body><header><a href="{{ url_for('index') }}">Code Flow Mapper</a><span>v{{ version }}</span></header>
+<main>{% block body %}{% endblock %}</main></body></html>

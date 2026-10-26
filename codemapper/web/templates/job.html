@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="card"><h1>{{ job.project }}</h1>
+<p>Status: <span class="pill {{ job.status }}" id="st">{{ job.status }}</span>
+{% if job.author %}<span class="hint"> &nbsp; author {{ job.author }}</span>{% endif %}</p>
+<div id="res"></div>
+<pre class="log" id="log">{{ job.log|join('\n') }}</pre>
+<form method="post" action="{{ url_for('delete', jid=job.id) }}" onsubmit="return confirm('Delete this run and its files?')"><button class="btn small alt" type="submit">Delete run</button></form>
+</div>
+<script>
+const jid = "{{ job.id }}";
+function show(r){
+  if(!r || !r.counts) return;
+  const c = r.counts, f = (p,dl)=>`/job/${jid}/file/${p}${dl?'?dl=1':''}`;
+  document.getElementById('res').innerHTML = `<div class="stats">
+   <div class="stat"><b>${c.flows}</b>flows</div><div class="stat"><b>${c.functionalities}</b>functionalities</div>
+   <div class="stat"><b>${c.modules}</b>modules</div><div class="stat"><b>${c.tools}</b>tools</div>
+   <div class="stat"><b>${c.dependencies}</b>dependencies</div><div class="stat"><b>${c.files}</b>source files</div><div class="stat"><b>${c.pdfs}</b>PDFs</div></div>
+   <p style="margin-top:14px"><a class="btn" href="${f(r.archive_zip,1)}">Download archive</a>
+   <a class="btn alt" href="${f(r.working_zip,1)}">Working report</a>
+   <a class="btn alt" href="${f(r.cover)}" target="_blank">Archive cover</a>
+   <a class="btn alt" href="/job/${jid}/flows">Browse flows</a></p>`;
+}
+async function poll(){
+  const r = await fetch(`/job/${jid}/status`).then(x=>x.json());
+  document.getElementById('st').textContent = r.status; document.getElementById('st').className = 'pill ' + r.status;
+  const lg = document.getElementById('log'); lg.textContent = r.log.join('\n'); lg.scrollTop = lg.scrollHeight;
+  show(r.result);
+  if(r.status === 'running' || r.status === 'queued') setTimeout(poll, 1500);
+}
+poll();
+</script>
+{% endblock %}

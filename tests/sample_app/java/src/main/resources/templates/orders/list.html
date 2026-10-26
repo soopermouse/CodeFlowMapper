@@ -1,0 +1,10 @@
+<html><head><title>Orders</title></head><body>
+<form th:action="@{/orders/list}" method="get">
+  <select name="status">
+    <option value="OPEN">Open</option>
+    <option value="SHIPPED">Shipped</option>
+  </select>
+  <button type="submit">Filter</button>
+</form>
+<a href="/orders/create">New order</a>
+</body></html>

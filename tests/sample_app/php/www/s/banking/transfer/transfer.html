@@ -1,0 +1,37 @@
+<?php
+require_once('common.inc');
+require_once('ticket.inc');
+require_once('www/s/banking/transfer/transfer.inc');
+
+$user->authorize('BankBO');
+$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'search';
+$t = new Transfer();
+switch ($action) {
+    case 'search':
+        $list = $t->getTransfers($_GET['account'], $_GET['status']);
+        break;
+    case 'cancel':
+        if ($t->cancelTransfer($_POST['id'])) {
+            header('Location: transfer.html?action=search');
+        } else {
+            $error = "The transfer could not be cancelled";
+        }
+        break;
+}
+?>
+<html><head><title>Money transfers</title></head><body>
+<h1>Money transfers</h1>
+<form name="search" method="get" action="transfer.html">
+<input type="hidden" name="action" value="search">
+<label for="acc">Account number</label> <input type="text" id="acc" name="account" maxlength="16" required>
+Status <select name="status">
+  <option value="">All</option>
+  <option value="W">Waiting</option>
+  <option value="E" selected>Executed</option>
+  <option value="C">Cancelled</option>
+</select>
+Currency <select name="currency"><?php foreach (BankTools::getCurrencies() as $c) { echo "<option value='$c'>$c</option>"; } ?></select>
+<input type="submit" value="Search">
+</form>
+<a href="transferview.html?id=12">View</a>
+</body></html>

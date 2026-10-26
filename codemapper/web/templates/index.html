@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block body %}
+{% if error %}<div class="error">{{ error }}</div>{% endif %}
+<form class="card" method="post" action="{{ url_for('run') }}" enctype="multipart/form-data">
+  <h1>New mapping</h1>
+  <p class="hint">Give the code in any mix: source folders or zips, photos or screenshots of the code (read with OCR), SonarQube exports
+  (issues, source lines, component tree) or scanner logs, or a git URL.</p>
+  <div class="grid">
+    <div><label>Application name</label><input type="text" name="project" placeholder="e.g. Intranet" required></div>
+    <div><label>Author <span class="hint">written on every document</span></label><input type="text" name="author"></div>
+  </div>
+  <label>Files <span class="hint">zips, code files, images, SonarQube JSON or logs</span></label>
+  <div class="drop"><input type="file" name="files" multiple></div>
+  <label>Or a whole folder</label>
+  <div class="drop"><input type="file" name="files" webkitdirectory directory multiple></div>
+  <label>Git URLs{% if allow_paths %} or folder paths on this machine{% endif %} <span class="hint">one per line</span></label>
+  <textarea name="paths" rows="3" placeholder="https://github.com/org/repo.git{% if allow_paths %}&#10;/home/me/projects/legacy-app{% endif %}"></textarea>
+  <details><summary>Settings</summary>
+    <div class="grid">
+      <div><label>Flows needed for a tool <span class="hint">fewer flows make it a dependency</span></label><input type="number" name="tool_min_flows" value="{{ defaults.tool_min_flows }}" min="2"></div>
+      <div><label>Call depth <span class="hint">levels followed from each entry point</span></label><input type="number" name="call_depth" value="{{ defaults.call_depth }}" min="1" max="10"></div>
+    </div>
+    <label><input type="checkbox" name="split_switch" checked> One flow per case when an endpoint is a switch on a request parameter</label>
+    <label>More settings (YAML) <span class="hint">modules, functionalities, middle-layer patterns, tool rules: see the README</span></label>
+    <textarea name="config_yaml" rows="7" placeholder="modules:&#10;  - match: 'www/s/(\w+)/(\w+)/'&#10;    module: '\1'&#10;    submodule: '\2'&#10;tool_rules:&#10;  - name: Quotes and exchange rates&#10;    match: 'getQuote|ExchangeRate'"></textarea>
+  </details>
+  <p style="margin-top:16px"><button type="submit">Map it</button></p>
+</form>
+<div class="card"><h2>Runs</h2>
+{% if jobs %}<table><tr><th>Started</th><th>Application</th><th>Status</th><th>Flows</th><th></th></tr>
+{% for j in jobs %}<tr><td>{{ j.created|int|string }}</td><td>{{ j.project }}</td><td><span class="pill {{ j.status }}">{{ j.status }}</span></td>
+<td>{{ (j.result.counts or {}).flows if j.result else '' }}</td><td><a class="btn small alt" href="{{ url_for('job', jid=j.id) }}">Open</a></td></tr>{% endfor %}</table>
+{% else %}<p class="hint">No runs yet.</p>{% endif %}</div>
+<script>document.querySelectorAll('td:first-child').forEach(td=>{const n=parseInt(td.textContent);if(n>1e9)td.textContent=new Date(n*1000).toLocaleString();});</script>
+{% endblock %}

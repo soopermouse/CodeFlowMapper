@@ -1,0 +1,11 @@
+<html><head><title>Customer search</title></head><body>
+<form id="f">
+ <label for="n">Name</label><input id="n" name="name" required>
+ <select name="page"><option value="0">First page</option><option value="1">Second page</option></select>
+ <button type="submit">Search</button>
+</form>
+<script>
+document.getElementById('f').onsubmit = function(e){ e.preventDefault(); fetch('/api/customers?name=' + n.value).then(r => r.json()); };
+function block(id){ $.post('/api/customers/' + id + '/block', {reason: 'manual'}); }
+</script>
+</body></html>

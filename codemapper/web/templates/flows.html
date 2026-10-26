@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="card"><h1>{{ job.project }}: flows</h1>
+<p><a class="btn small alt" href="{{ url_for('job', jid=job.id) }}">Back to the run</a></p>
+<input class="filter" type="text" placeholder="Filter" oninput="flt(this.value)">
+<table id="t"><tr><th>Flow</th><th>Name</th><th>Functionality</th><th>Entry</th><th>Upstream</th><th>Downstream</th><th>Tables</th><th>Documents</th></tr>
+{% for f in flows %}<tr><td>{{ f.id }}</td><td>{{ f.name }}</td><td>{{ f.functionality }}</td><td><span class="hint">{{ f.kind }}</span><br>{{ f.entry }}</td>
+<td>{{ f.up|join(', ') }}</td><td>{{ f.down|join(', ') }}</td><td>{{ f.tables|join(', ') }}</td>
+<td>{% if f.dir %}<a href="{{ url_for('file', jid=job.id, rel=f.dir ~ '/' ~ f.id ~ '_cover_sheet.pdf') }}" target="_blank">cover</a> ·
+<a href="{{ url_for('file', jid=job.id, rel=f.dir ~ '/' ~ f.id ~ '_functional_flow.pdf') }}" target="_blank">functional</a> ·
+<a href="{{ url_for('file', jid=job.id, rel=f.dir ~ '/' ~ f.id ~ '_architectural_flow.pdf') }}" target="_blank">architectural</a>{% endif %}</td></tr>{% endfor %}
+</table></div>
+<script>function flt(q){q=q.toLowerCase();document.querySelectorAll('#t tr').forEach((tr,i)=>{if(i)tr.style.display=tr.textContent.toLowerCase().includes(q)?'':'none';});}</script>
+{% endblock %}
